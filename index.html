@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resultados G7 Mate PI</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.6.0/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+      background: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 3rem 1.25rem 4rem;
+      color: #111827;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 520px;
+    }
+
+    /* ── Encabezado ── */
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .header-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: #1e40af;
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 16px;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #0f172a;
+      line-height: 1.35;
+      margin-bottom: 8px;
+    }
+
+    .header .subtitle {
+      font-size: 15px;
+      color: #64748b;
+    }
+
+    .divider {
+      height: 1px;
+      background: #e2e8f0;
+      margin-bottom: 2rem;
+    }
+
+    /* ── Tarjeta del selector ── */
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 1.25rem 1.5rem;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: #475569;
+      margin-bottom: 8px;
+    }
+
+    select {
+      width: 100%;
+      padding: 10px 36px 10px 14px;
+      font-size: 15px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      background-color: #ffffff;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      color: #111827;
+      appearance: none;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+
+    select:disabled {
+      background-color: #f8fafc;
+      color: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    /* ── Mensaje de error del CSV ── */
+    .csv-error {
+      display: none;
+      margin-top: 0.75rem;
+      padding: 10px 14px;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #b91c1c;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .csv-error.hidden { display: none; }
+
+    /* ── Resultados ── */
+    .results {
+      display: none;
+      margin-top: 1rem;
+    }
+
+    .results.visible {
+      display: block;
+    }
+
+    .result-card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .result-bar {
+      height: 4px;
+      width: 100%;
+      transition: background 0.25s;
+    }
+
+    .result-row {
+      padding: 1rem 1.5rem;
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .result-row + .result-row {
+      border-top: 1px solid #f1f5f9;
+    }
+
+    .result-row .ti {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .result-text {
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .result-text strong {
+      font-weight: 600;
+    }
+
+    #line2 {
+      font-size: 16.5px;
+    }
+
+    /* ── Clases semánticas de color ── */
+    .success { color: #15803d; }
+    .warning { color: #b45309; }
+    .danger  { color: #b91c1c; }
+
+    /* ── Contacto y Footer ── */
+    .contact-note {
+      text-align: center;
+      margin-top: 2rem;
+      font-size: 14px;
+      color: #475569;
+    }
+
+    .contact-note a {
+      color: #1e40af;
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .contact-note a:hover {
+      text-decoration: underline;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="header">
+    <span class="header-badge">Recuperatorio · 2do Parcial</span>
+    <h1>Matemática para Ingeniería<br>Grupo 7 - 2026</h1>
+    <p class="subtitle">Resultados del Recuperatorio de Segundo Parcial</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="card">
+    <label for="legajo-select">Selecciona tu número de Legajo</label>
+    <select id="legajo-select" onchange="showResults()" disabled>
+      <option value="">Cargando datos...</option>
+    </select>
+    <div class="csv-error hidden" id="csv-error">
+      <i class="ti ti-alert-circle" aria-hidden="true"></i>
+      No se pudieron cargar los datos. Intentá recargar la página o escribinos al correo de contacto.
+    </div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="result-card">
+      <div class="result-bar" id="result-bar"></div>
+      <div class="result-row">
+        <i id="icon1" class="ti" aria-hidden="true"></i>
+        <div class="result-text" id="line1"></div>
+      </div>
+      <div class="result-row">
+        <i id="icon2" class="ti" aria-hidden="true"></i>
+        <div class="result-text" id="line2"></div>
+      </div>
+    </div>
+  </div>
+
+  <p class="contact-note">Ante cualquier inconveniente, escribinos al correo <a href="mailto:matepi.grupo7@gmail.com">matepi.grupo7@gmail.com</a></p>
+
+  <div class="footer">Facultad de Ingeniería · Universidad Nacional de La Plata</div>
+
+</div>
+
+<script>
+
+  let DATA = {};
+
+  /* ── Carga y parseo del CSV ── */
+  async function loadCSV() {
+    const select   = document.getElementById("legajo-select");
+    const errorDiv = document.getElementById("csv-error");
+
+    try {
+      const response = await fetch("prueba.csv");
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const text  = await response.text();
+      const lines = text.trim().split(/\r?\n/);   // tolerante a saltos Windows y Unix
+
+      // Fila 0 = encabezado (Legajo|2P2F|Situacion), se omite
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split("|").map(s => s.trim());
+        if (cols.length < 3 || !cols[0]) continue;
+
+        const [legajo, p2fRaw, sitRaw] = cols;
+
+        DATA[legajo] = {
+          p2f: Number(p2fRaw),
+          // Si el valor de Situacion es numérico, lo guardamos como número; si no, como string
+          sit: isNaN(sitRaw) ? sitRaw : Number(sitRaw)
+        };
+      }
+
+      // Poblar el <select> con los legajos ordenados numéricamente
+      const legajos = Object.keys(DATA).sort((a, b) => Number(a) - Number(b));
+      select.innerHTML = '<option value="">— Seleccionar —</option>';
+      legajos.forEach(legajo => {
+        const opt = document.createElement("option");
+        opt.value       = legajo;
+        opt.textContent = legajo;
+        select.appendChild(opt);
+      });
+
+      select.disabled = false;
+
+    } catch (err) {
+      console.error("Error cargando prueba.csv:", err);
+      select.options[0].textContent = "Error al cargar los datos";
+      errorDiv.classList.remove("hidden");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", loadCSV);
+
+  /* ── Mensajes por situación ── */
+  const SITUACIONES = {
+    "Rec 1":     { msg: "<strong>Debe recuperar el Primer Parcial en el Flotante</strong> para acceder a la Promoción.",    cls: "warning", icon: "ti-alert-triangle" },
+    "Rec 2":     { msg: "<strong>Debe recuperar el Segundo Parcial en el Flotante</strong> para acceder a la Promoción.",   cls: "warning", icon: "ti-alert-triangle" },
+    "Rec 1 o 2": { msg: "<strong>Debe recuperar alguno de los Parciales en Flotante</strong> para acceder a la Promoción.", cls: "warning", icon: "ti-alert-triangle" },
+    "D":         { msg: "Lamentablemente <strong>debe volver a cursar la materia</strong>.",                                 cls: "danger",  icon: "ti-refresh-alert"  }
+  };
+
+  const BAR_COLORS = {
+    success: "#15803d",
+    warning: "#b45309",
+    danger:  "#b91c1c"
+  };
+
+  function showResults() {
+    const legajo     = document.getElementById("legajo-select").value;
+    const resultsDiv = document.getElementById("results");
+
+    if (!legajo) {
+      resultsDiv.classList.remove("visible");
+      return;
+    }
+
+    const { p2f, sit } = DATA[legajo];
+    const line1 = document.getElementById("line1");
+    const line2 = document.getElementById("line2");
+    const icon1 = document.getElementById("icon1");
+    const icon2 = document.getElementById("icon2");
+    const bar   = document.getElementById("result-bar");
+
+    /* Línea 1: resultado del parcial */
+    if (p2f >= 4) {
+      line1.innerHTML = `El parcial está <strong>Aprobado con nota ${p2f}</strong>`;
+      line1.className = "result-text";
+      icon1.className = "ti ti-circle-check success";
+    } else {
+      line1.innerHTML = "El parcial está <strong>Desaprobado</strong>";
+      line1.className = "result-text";
+      icon1.className = "ti ti-circle-x danger";
+    }
+
+    /* Línea 2: situación académica */
+    let barColorKey;
+
+    if (SITUACIONES[sit]) {
+      const { msg, cls, icon } = SITUACIONES[sit];
+      line2.innerHTML = msg;
+      line2.className = `result-text ${cls}`;
+      icon2.className = `ti ${icon} ${cls}`;
+      barColorKey     = cls;
+    } else {
+      /* sit es una nota numérica >= 6: promociona */
+      line2.innerHTML = `<strong>Promociona</strong> con nota final <strong>${sit}</strong>. ¡Felicitaciones!`;
+      line2.className = "result-text success";
+      icon2.className = "ti ti-star success";
+      barColorKey     = "success";
+    }
+
+    bar.style.background = BAR_COLORS[barColorKey];
+    resultsDiv.classList.add("visible");
+  }
+
+</script>
+</body>
+</html>
