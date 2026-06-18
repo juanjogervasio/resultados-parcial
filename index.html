@@ -261,28 +261,32 @@
     const errorDiv = document.getElementById("csv-error");
 
     try {
-      const response = await fetch("prueba.csv");
+      const response = await fetch("resultados.csv");
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const text  = await response.text();
-      const lines = text.trim().split(/\r?\n/);   // tolerante a saltos Windows y Unix
+      // .replace elimina el BOM que agrega Excel al guardar como CSV
+      const lines = text.replace(/^\uFEFF/, "").trim().split(/\r?\n/);
 
-      // Fila 0 = encabezado (Legajo|2P2F|Situacion), se omite
+      // Fila 0 = encabezado (Legajo;2P2F;Situacion), se omite
       for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split("|").map(s => s.trim());
+        const cols = lines[i].split(";").map(s => s.trim());
         if (cols.length < 3 || !cols[0]) continue;
 
         const [legajo, p2fRaw, sitRaw] = cols;
 
         DATA[legajo] = {
-          p2f: Number(p2fRaw),
+          // Reemplaza coma decimal (Excel argentino) por punto antes de convertir
+          p2f: Number(p2fRaw.replace(",", ".")),
           // Si el valor de Situacion es numérico, lo guardamos como número; si no, como string
-          sit: isNaN(sitRaw) ? sitRaw : Number(sitRaw)
+          sit: isNaN(sitRaw) || sitRaw === "" ? sitRaw : Number(sitRaw)
         };
       }
 
-      // Poblar el <select> con los legajos ordenados numéricamente
-      const legajos = Object.keys(DATA).sort((a, b) => Number(a) - Number(b));
+      // Poblar el <select> con los legajos ordenados por su parte numérica
+      const legajos = Object.keys(DATA).sort((a, b) => {
+        return parseInt(a.split("/")[0], 10) - parseInt(b.split("/")[0], 10);
+      });
       select.innerHTML = '<option value="">— Seleccionar —</option>';
       legajos.forEach(legajo => {
         const opt = document.createElement("option");
@@ -294,7 +298,7 @@
       select.disabled = false;
 
     } catch (err) {
-      console.error("Error cargando prueba.csv:", err);
+      console.error("Error cargando resultados.csv:", err);
       select.options[0].textContent = "Error al cargar los datos";
       errorDiv.classList.remove("hidden");
     }
