@@ -362,11 +362,14 @@
       line1.innerHTML = `El parcial está <strong>Aprobado con nota ${p2f}</strong>`;
       line1.className = "result-text";
       icon1.className = "ti ti-circle-check success";
-    } else {
+    } else if (p2f >= 0) {
       line1.innerHTML = "El parcial está <strong>Desaprobado</strong>";
       line1.className = "result-text";
       icon1.className = "ti ti-circle-x danger";
-    }
+    } else {
+      line1.innerHTML = "El parcial está <strong>Aprobado</strong>";
+      line1.className = "result-text";
+      icon1.className = "ti ti-circle-check success";
 
     /* Línea 2: situación académica */
     let barColorKey;
