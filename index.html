@@ -184,6 +184,7 @@
     #line-name {
       color: #475569;
       font-weight: 500;
+      text-transform: uppercase; 
     }
 
     /* ── Clases semánticas de color ── */
@@ -258,7 +259,7 @@
     </div>
   </div>
 
-  <p class="contact-note">Ante cualquier inconveniente, escribinos al correo <a href="mailto:matepi.grupo7@gmail.com">matepi.grupo7@gmail.com</a></p>
+  <p class="contact-note">Ante cualquier duda o inconveniente, escribinos al correo <a href="mailto:matepi.grupo7@gmail.com">matepi.grupo7@gmail.com</a></p>
 
   <div class="footer">Facultad de Ingeniería · Universidad Nacional de La Plata</div>
 
@@ -293,7 +294,8 @@
           // Reemplaza coma decimal (Excel argentino) por punto antes de convertir
           p2f: Number(p2fRaw.replace(",", ".")),
           // Si el valor de Situacion es numérico, lo guardamos como número; si no, como string
-          sit: isNaN(sitRaw) || sitRaw === "" ? sitRaw : Number(sitRaw)
+          // .replace elimina las comillas que Excel agrega alrededor de texto libre
+          sit: isNaN(sitRaw) || sitRaw === "" ? sitRaw.replace(/^"|"$/g, "").trim() : Number(sitRaw)
         };
       }
 
@@ -352,7 +354,7 @@
     const bar   = document.getElementById("result-bar");
 
     /* Línea de nombre */
-    lineName.textContent = `Apellido y Nombre: ${nombre}`;
+    lineName.innerHTML = `<strong>Apellido y Nombre:</strong> ${nombre}`;
 
 
     /* Línea 1: resultado del parcial */
@@ -375,12 +377,18 @@
       line2.className = `result-text ${cls}`;
       icon2.className = `ti ${icon} ${cls}`;
       barColorKey     = cls;
-    } else {
-      /* sit es una nota numérica >= 6: promociona */
+    } else if (typeof sit === "number") {
+      /* nota numérica >= 6: promociona */
       line2.innerHTML = `<strong>Promociona</strong> con nota final <strong>${sit}</strong>. ¡Felicitaciones!`;
       line2.className = "result-text success";
       icon2.className = "ti ti-star success";
       barColorKey     = "success";
+    } else {
+      /* texto libre del CSV: se muestra tal cual */
+      line2.textContent = sit;
+      line2.className   = "result-text warning";
+      icon2.className   = "ti ti-info-circle warning";
+      barColorKey       = "warning";
     }
 
     bar.style.background = BAR_COLORS[barColorKey];
