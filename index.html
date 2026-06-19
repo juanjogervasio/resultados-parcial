@@ -177,6 +177,15 @@
       font-size: 16.5px;
     }
 
+    #row-name .ti-user {
+      color: #64748b;
+    }
+
+    #line-name {
+      color: #475569;
+      font-weight: 500;
+    }
+
     /* ── Clases semánticas de color ── */
     .success { color: #15803d; }
     .warning { color: #b45309; }
@@ -234,6 +243,10 @@
   <div class="results" id="results">
     <div class="result-card">
       <div class="result-bar" id="result-bar"></div>
+      <div class="result-row" id="row-name">
+        <i class="ti ti-user" aria-hidden="true"></i>
+        <div class="result-text" id="line-name"></div>
+      </div>
       <div class="result-row">
         <i id="icon1" class="ti" aria-hidden="true"></i>
         <div class="result-text" id="line1"></div>
@@ -268,14 +281,15 @@
       // .replace elimina el BOM que agrega Excel al guardar como CSV
       const lines = text.replace(/^\uFEFF/, "").trim().split(/\r?\n/);
 
-      // Fila 0 = encabezado (Legajo;2P2F;Situacion), se omite
+      // Fila 0 = encabezado (Legajo;Nombre;2P2F;Situacion), se omite
       for (let i = 1; i < lines.length; i++) {
         const cols = lines[i].split(";").map(s => s.trim());
-        if (cols.length < 3 || !cols[0]) continue;
+        if (cols.length < 4 || !cols[0]) continue;
 
-        const [legajo, p2fRaw, sitRaw] = cols;
+        const [legajo, nombre, p2fRaw, sitRaw] = cols;
 
         DATA[legajo] = {
+          nombre: nombre,
           // Reemplaza coma decimal (Excel argentino) por punto antes de convertir
           p2f: Number(p2fRaw.replace(",", ".")),
           // Si el valor de Situacion es numérico, lo guardamos como número; si no, como string
@@ -329,12 +343,17 @@
       return;
     }
 
-    const { p2f, sit } = DATA[legajo];
+    const { nombre, p2f, sit } = DATA[legajo];
+    const lineName = document.getElementById("line-name");
     const line1 = document.getElementById("line1");
     const line2 = document.getElementById("line2");
     const icon1 = document.getElementById("icon1");
     const icon2 = document.getElementById("icon2");
     const bar   = document.getElementById("result-bar");
+
+    /* Línea de nombre */
+    lineName.textContent = `Apellido y Nombre: ${nombre}`;
+
 
     /* Línea 1: resultado del parcial */
     if (p2f >= 4) {
