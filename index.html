@@ -71,41 +71,101 @@
       padding: 1.25rem 1.5rem;
     }
 
-    label {
+    .card-label {
       display: block;
       font-size: 13px;
       font-weight: 500;
       color: #475569;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
 
-    select {
-      width: 100%;
-      padding: 10px 36px 10px 14px;
-      font-size: 15px;
-      border: 1px solid #cbd5e1;
+    .card-hint {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 18px;
+      line-height: 1.5;
+    }
+
+    .card-hint strong {
+      color: #64748b;
+      font-weight: 600;
+    }
+
+    /* ── Bloques de dígitos ── */
+    .legajo-input {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(4px, 1.2vw, 7px);
+    }
+
+    .digit-box {
+      width: clamp(34px, 9vw, 44px);
+      height: clamp(42px, 11vw, 52px);
+      text-align: center;
+      font-size: clamp(18px, 4.5vw, 22px);
+      font-weight: 700;
+      font-family: 'Courier New', Courier, monospace;
+      border: 1.5px solid #cbd5e1;
       border-radius: 8px;
-      background-color: #ffffff;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      color: #111827;
-      appearance: none;
-      cursor: pointer;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      background: #ffffff;
+      color: #0f172a;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+      caret-color: transparent;
     }
 
-    select:focus {
-      outline: none;
+    .digit-box:focus {
       border-color: #3b82f6;
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+      background: #f8fafc;
     }
 
-    select:disabled {
-      background-color: #f8fafc;
+    .digit-box.filled {
+      border-color: #94a3b8;
+      background: #f8fafc;
+    }
+
+    .digit-box:disabled {
+      background: #f1f5f9;
+      border-color: #e2e8f0;
       color: #94a3b8;
       cursor: not-allowed;
     }
+
+    .legajo-slash {
+      font-size: clamp(22px, 5.5vw, 28px);
+      font-weight: 300;
+      color: #94a3b8;
+      padding: 0 2px;
+      user-select: none;
+      line-height: 1;
+    }
+
+    .loading-hint {
+      margin-top: 10px;
+      font-size: 12px;
+      color: #94a3b8;
+      text-align: center;
+    }
+
+    .loading-hint.hidden { display: none; }
+
+    /* ── Error de búsqueda ── */
+    .search-error {
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: #fff7ed;
+      border: 1px solid #fed7aa;
+      border-radius: 8px;
+      font-size: 13px;
+      color: #9a3412;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .search-error.hidden { display: none; }
 
     /* ── Mensaje de error del CSV ── */
     .csv-error {
@@ -231,10 +291,23 @@
   <div class="divider"></div>
 
   <div class="card">
-    <label for="legajo-select">Selecciona tu número de Legajo</label>
-    <select id="legajo-select" onchange="showResults()" disabled>
-      <option value="">Cargando datos...</option>
-    </select>
+    <span class="card-label">Ingrese su número de Legajo</span>
+    <p class="card-hint">Completar con ceros a la izquierda si fuera necesario, por ejemplo: <strong>001234/7</strong></p>
+    <div class="legajo-input">
+      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 1 del legajo" disabled>
+      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 2 del legajo" disabled>
+      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 3 del legajo" disabled>
+      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 4 del legajo" disabled>
+      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 5 del legajo" disabled>
+      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 6 del legajo" disabled>
+      <span class="legajo-slash">/</span>
+      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito verificador del legajo" disabled>
+    </div>
+    <p class="loading-hint" id="loading-hint">Cargando datos...</p>
+    <div class="search-error hidden" id="search-error">
+      <i class="ti ti-search-off" aria-hidden="true"></i>
+      Legajo no encontrado. Verificá que todos los dígitos sean correctos.
+    </div>
     <div class="csv-error hidden" id="csv-error">
       <i class="ti ti-alert-circle" aria-hidden="true"></i>
       No se pudieron cargar los datos. Intentá recargar la página o escribinos al correo de contacto.
@@ -271,8 +344,8 @@
 
   /* ── Carga y parseo del CSV ── */
   async function loadCSV() {
-    const select   = document.getElementById("legajo-select");
     const errorDiv = document.getElementById("csv-error");
+    const boxes    = Array.from(document.querySelectorAll(".digit-box"));
 
     try {
       const response = await fetch("resultados.csv");
@@ -299,28 +372,103 @@
         };
       }
 
-      // Poblar el <select> con los legajos ordenados por su parte numérica
-      const legajos = Object.keys(DATA).sort((a, b) => {
-        return parseInt(a.split("/")[0], 10) - parseInt(b.split("/")[0], 10);
-      });
-      select.innerHTML = '<option value="">— Seleccionar —</option>';
-      legajos.forEach(legajo => {
-        const opt = document.createElement("option");
-        opt.value       = legajo;
-        opt.textContent = legajo;
-        select.appendChild(opt);
-      });
-
-      select.disabled = false;
+      // Habilitar los bloques de dígitos y ocultar el hint de carga
+      boxes.forEach(b => b.disabled = false);
+      document.getElementById("loading-hint").classList.add("hidden");
+      boxes[0].focus();
 
     } catch (err) {
       console.error("Error cargando resultados.csv:", err);
-      select.options[0].textContent = "Error al cargar los datos";
       errorDiv.classList.remove("hidden");
+      document.getElementById("loading-hint").classList.add("hidden");
     }
   }
 
-  document.addEventListener("DOMContentLoaded", loadCSV);
+  /* ── Lógica de los bloques de dígitos ── */
+  function initDigitBoxes() {
+    const boxes = Array.from(document.querySelectorAll(".digit-box"));
+
+    boxes.forEach((box, idx) => {
+
+      box.addEventListener("focus", () => box.select());
+
+      box.addEventListener("input", (e) => {
+        const val = e.target.value.replace(/[^0-9]/g, "");
+        e.target.value = val ? val.slice(-1) : "";
+
+        if (e.target.value) {
+          box.classList.add("filled");
+          if (idx < boxes.length - 1) boxes[idx + 1].focus();
+        } else {
+          box.classList.remove("filled");
+        }
+        checkAndSearch();
+      });
+
+      box.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && !box.value && idx > 0) {
+          boxes[idx - 1].value = "";
+          boxes[idx - 1].classList.remove("filled");
+          boxes[idx - 1].focus();
+          checkAndSearch();
+        } else if (e.key === "ArrowLeft" && idx > 0) {
+          e.preventDefault();
+          boxes[idx - 1].focus();
+        } else if (e.key === "ArrowRight" && idx < boxes.length - 1) {
+          e.preventDefault();
+          boxes[idx + 1].focus();
+        }
+      });
+
+      // Pegado: extraer dígitos y distribuirlos desde la casilla actual
+      box.addEventListener("paste", (e) => {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData).getData("text");
+        const digits = pasted.replace(/[^0-9]/g, "");
+        digits.slice(0, 7 - idx).split("").forEach((d, i) => {
+          const target = boxes[idx + i];
+          if (target) { target.value = d; target.classList.add("filled"); }
+        });
+        const nextEmpty = boxes.findIndex(b => !b.value);
+        (nextEmpty !== -1 ? boxes[nextEmpty] : boxes[boxes.length - 1]).focus();
+        checkAndSearch();
+      });
+    });
+  }
+
+  function getLegajo() {
+    const boxes = Array.from(document.querySelectorAll(".digit-box"));
+    return boxes.slice(0, 6).map(b => b.value).join("") + "/" + boxes[6].value;
+  }
+
+  function checkAndSearch() {
+    const boxes      = Array.from(document.querySelectorAll(".digit-box"));
+    const errorEl    = document.getElementById("search-error");
+    const resultsDiv = document.getElementById("results");
+
+    // Esperar a que todos los bloques estén completos antes de buscar
+    if (!boxes.every(b => b.value !== "")) {
+      errorEl.classList.add("hidden");
+      resultsDiv.classList.remove("visible");
+      return;
+    }
+
+    const legajo = getLegajo();
+
+    if (!DATA[legajo]) {
+      errorEl.classList.remove("hidden");
+      resultsDiv.classList.remove("visible");
+      return;
+    }
+
+    errorEl.classList.add("hidden");
+    showResults(legajo);
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    initDigitBoxes();
+    loadCSV();
+  });
 
   /* ── Mensajes por situación ── */
   const SITUACIONES = {
@@ -336,15 +484,8 @@
     danger:  "#b91c1c"
   };
 
-  function showResults() {
-    const legajo     = document.getElementById("legajo-select").value;
+  function showResults(legajo) {
     const resultsDiv = document.getElementById("results");
-
-    if (!legajo) {
-      resultsDiv.classList.remove("visible");
-      return;
-    }
-
     const { nombre, p2f, sit } = DATA[legajo];
     const lineName = document.getElementById("line-name");
     const line1 = document.getElementById("line1");
