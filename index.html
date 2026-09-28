@@ -130,6 +130,15 @@
 
   const CSV_URL   = "resultados.csv";
   const NUM_TEMAS = 5;
+
+  // Descripción de cada tema (columnas 1P1F_1 a 1P1F_5)
+  const TEMAS = {
+    1: "Series de potencias",
+    2: "Desarrollo de Taylor",
+    3: "Sistemas de ecuaciones lineales",
+    4: "Matrices y determinantes",
+    5: "Espacios vectoriales"
+  };
   let DATA = {};
 
   // Nota numérica (admite coma o punto decimal)
@@ -312,9 +321,11 @@
     document.getElementById("line1").innerHTML = html;
     document.getElementById("icon1").className = `ti ${icon} ${cls}`;
 
-    /* Línea 2: temas aprobados (columnas 1P1F_1 a 1P1F_5 con nota numérica) */
-    const aprobados = temas
-      .map((v, i) => esNota(v) ? `<div>El <strong>Tema ${i + 1}</strong> está Aprobado con puntaje <strong>${esc(v)}</strong></div>` : "")
+    /* Línea 2: temas aprobados (columnas 1P1F_1 a 1P1F_5 con nota numérica).
+       No se muestra si el parcial está Desaprobado o Aprobado con nota. */
+    const mostrarTemas = sit.toUpperCase() !== "DESAPROBADO" && !esNota(sit);
+    const aprobados = !mostrarTemas ? [] : temas
+      .map((v, i) => esNota(v) ? `<div>El <strong>Tema ${i + 1} - ${TEMAS[i + 1]}</strong> está Aprobado con puntaje <strong>${esc(v)}</strong></div>` : "")
       .filter(Boolean);
     document.getElementById("line2").innerHTML = aprobados.join("");
     document.getElementById("icon2").className = "ti ti-checklist success";
