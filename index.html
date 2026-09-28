@@ -7,275 +7,63 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.6.0/tabler-icons.min.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-      background: #f1f5f9;
-      min-height: 100vh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
-      padding: 3rem 1.25rem 4rem;
-      color: #111827;
-    }
-
-    .page {
-      width: 100%;
-      max-width: 520px;
-    }
+    body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: #f1f5f9; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 3rem 1.25rem 4rem; color: #111827; }
+    .page { width: 100%; max-width: 520px; }
 
     /* ── Encabezado ── */
-    .header {
-      text-align: center;
-      margin-bottom: 2rem;
-    }
-
-    .header-badge {
-      display: inline-block;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: #1e40af;
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      padding: 4px 14px;
-      border-radius: 999px;
-      margin-bottom: 16px;
-    }
-
-    .header h1 {
-      font-size: 22px;
-      font-weight: 600;
-      color: #0f172a;
-      line-height: 1.35;
-      margin-bottom: 8px;
-    }
-
-    .header .subtitle {
-      font-size: 15px;
-      color: #64748b;
-    }
-
-    .divider {
-      height: 1px;
-      background: #e2e8f0;
-      margin-bottom: 2rem;
-    }
+    .header { text-align: center; margin-bottom: 2rem; }
+    .header-badge { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #1e40af; background: #eff6ff; border: 1px solid #bfdbfe; padding: 4px 14px; border-radius: 999px; margin-bottom: 16px; }
+    .header h1 { font-size: 22px; font-weight: 600; color: #0f172a; line-height: 1.35; margin-bottom: 8px; }
+    .header .subtitle { font-size: 15px; color: #64748b; }
+    .divider { height: 1px; background: #e2e8f0; margin-bottom: 2rem; }
 
     /* ── Tarjeta del selector ── */
-    .card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      padding: 1.25rem 1.5rem;
-    }
-
-    .card-label {
-      display: block;
-      font-size: 13px;
-      font-weight: 500;
-      color: #475569;
-      margin-bottom: 6px;
-    }
-
-    .card-hint {
-      font-size: 12px;
-      color: #94a3b8;
-      margin-bottom: 18px;
-      line-height: 1.5;
-    }
-
-    .card-hint strong {
-      color: #64748b;
-      font-weight: 600;
-    }
+    .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem 1.5rem; }
+    .card-label { display: block; font-size: 13px; font-weight: 500; color: #475569; margin-bottom: 6px; }
+    .card-hint { font-size: 12px; color: #94a3b8; margin-bottom: 18px; line-height: 1.5; }
+    .card-hint strong { color: #64748b; font-weight: 600; }
 
     /* ── Bloques de dígitos ── */
-    .legajo-input {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: clamp(4px, 1.2vw, 7px);
-    }
-
-    .digit-box {
-      width: clamp(34px, 9vw, 44px);
-      height: clamp(42px, 11vw, 52px);
-      text-align: center;
-      font-size: clamp(18px, 4.5vw, 22px);
-      font-weight: 700;
-      font-family: 'Courier New', Courier, monospace;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 8px;
-      background: #ffffff;
-      color: #0f172a;
-      outline: none;
-      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
-      caret-color: transparent;
-    }
-
-    .digit-box:focus {
-      border-color: #3b82f6;
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
-      background: #f8fafc;
-    }
-
-    .digit-box.filled {
-      border-color: #94a3b8;
-      background: #f8fafc;
-    }
-
-    .digit-box:disabled {
-      background: #f1f5f9;
-      border-color: #e2e8f0;
-      color: #94a3b8;
-      cursor: not-allowed;
-    }
-
-    .legajo-slash {
-      font-size: clamp(22px, 5.5vw, 28px);
-      font-weight: 300;
-      color: #94a3b8;
-      padding: 0 2px;
-      user-select: none;
-      line-height: 1;
-    }
-
-    .loading-hint {
-      margin-top: 10px;
-      font-size: 12px;
-      color: #94a3b8;
-      text-align: center;
-    }
-
+    .legajo-input { display: flex; align-items: center; justify-content: center; gap: clamp(4px, 1.2vw, 7px); }
+    .digit-box { width: clamp(34px, 9vw, 44px); height: clamp(42px, 11vw, 52px); text-align: center; font-size: clamp(18px, 4.5vw, 22px); font-weight: 700; font-family: 'Courier New', Courier, monospace; border: 1.5px solid #cbd5e1; border-radius: 8px; background: #ffffff; color: #0f172a; outline: none; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s; caret-color: transparent; }
+    .digit-box:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12); background: #f8fafc; }
+    .digit-box.filled { border-color: #94a3b8; background: #f8fafc; }
+    .digit-box:disabled { background: #f1f5f9; border-color: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
+    .legajo-slash { font-size: clamp(22px, 5.5vw, 28px); font-weight: 300; color: #94a3b8; padding: 0 2px; user-select: none; line-height: 1; }
+    .loading-hint { margin-top: 10px; font-size: 12px; color: #94a3b8; text-align: center; }
     .loading-hint.hidden { display: none; }
 
-    /* ── Error de búsqueda ── */
-    .search-error {
-      margin-top: 12px;
-      padding: 10px 14px;
-      background: #fff7ed;
-      border: 1px solid #fed7aa;
-      border-radius: 8px;
-      font-size: 13px;
-      color: #9a3412;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
+    /* ── Errores ── */
+    .search-error { margin-top: 12px; padding: 10px 14px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; font-size: 13px; color: #9a3412; display: flex; gap: 8px; align-items: center; }
     .search-error.hidden { display: none; }
-
-    /* ── Mensaje de error del CSV ── */
-    .csv-error {
-      display: none;
-      margin-top: 0.75rem;
-      padding: 10px 14px;
-      background: #fef2f2;
-      border: 1px solid #fecaca;
-      border-radius: 8px;
-      font-size: 13px;
-      color: #b91c1c;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
+    .csv-error { margin-top: 0.75rem; padding: 10px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; font-size: 13px; color: #b91c1c; display: flex; gap: 8px; align-items: center; }
     .csv-error.hidden { display: none; }
 
     /* ── Resultados ── */
-    .results {
-      display: none;
-      margin-top: 1rem;
-    }
-
-    .results.visible {
-      display: block;
-    }
-
-    .result-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    .result-bar {
-      height: 4px;
-      width: 100%;
-      transition: background 0.25s;
-    }
-
-    .result-row {
-      padding: 1rem 1.5rem;
-      display: flex;
-      gap: 12px;
-      align-items: flex-start;
-    }
-
-    .result-row + .result-row {
-      border-top: 1px solid #f1f5f9;
-    }
-
-    .result-row .ti {
-      font-size: 20px;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .result-text {
-      font-size: 14px;
-      line-height: 1.65;
-    }
-
-    .result-text strong {
-      font-weight: 600;
-    }
-
-    #line2 {
-      font-size: 16.5px;
-    }
-
-    #row-name .ti-user {
-      color: #64748b;
-    }
-
-    #line-name {
-      color: #475569;
-      font-weight: 500;
-      text-transform: uppercase; 
-    }
-
-    /* ── Clases semánticas de color ── */
+    .results { display: none; margin-top: 1rem; }
+    .results.visible { display: block; }
+    .result-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
+    .result-bar { height: 4px; width: 100%; transition: background 0.25s; }
+    .result-row { padding: 1rem 1.5rem; display: flex; gap: 12px; align-items: flex-start; }
+    .result-row + .result-row { border-top: 1px solid #f1f5f9; }
+    .result-row.hidden { display: none; }
+    .result-row .ti { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+    .result-text { font-size: 14px; line-height: 1.65; }
+    .result-text strong { font-weight: 600; }
+    #line1 { font-size: 16.5px; }
+    #line2 { font-size: 14.5px; }
+    #line2 div + div { margin-top: 4px; }
+    #row-name .ti-user { color: #64748b; }
+    #line-name { color: #475569; font-weight: 500; text-transform: uppercase; }
     .success { color: #15803d; }
     .warning { color: #b45309; }
     .danger  { color: #b91c1c; }
 
     /* ── Contacto y Footer ── */
-    .contact-note {
-      text-align: center;
-      margin-top: 2rem;
-      font-size: 14px;
-      color: #475569;
-    }
-
-    .contact-note a {
-      color: #1e40af;
-      text-decoration: none;
-      font-weight: 500;
-    }
-
-    .contact-note a:hover {
-      text-decoration: underline;
-    }
-
-    .footer {
-      text-align: center;
-      margin-top: 1.5rem;
-      font-size: 12px;
-      color: #94a3b8;
-    }
+    .contact-note { text-align: center; margin-top: 2rem; font-size: 14px; color: #475569; }
+    .contact-note a { color: #1e40af; text-decoration: none; font-weight: 500; }
+    .contact-note a:hover { text-decoration: underline; }
+    .footer { text-align: center; margin-top: 1.5rem; font-size: 12px; color: #94a3b8; }
   </style>
 </head>
 <body>
@@ -283,9 +71,9 @@
 <div class="page">
 
   <div class="header">
-    <span class="header-badge">Recuperatorio · 2do Parcial</span>
+    <span class="header-badge">1er Parcial · 1ra Fecha</span>
     <h1>Matemática para Ingeniería<br>Grupo 7 - 2026</h1>
-    <p class="subtitle">Resultados del Recuperatorio de Segundo Parcial</p>
+    <p class="subtitle">Resultados del Primer Parcial</p>
   </div>
 
   <div class="divider"></div>
@@ -325,7 +113,7 @@
         <i id="icon1" class="ti" aria-hidden="true"></i>
         <div class="result-text" id="line1"></div>
       </div>
-      <div class="result-row">
+      <div class="result-row" id="row-line2">
         <i id="icon2" class="ti" aria-hidden="true"></i>
         <div class="result-text" id="line2"></div>
       </div>
@@ -340,7 +128,19 @@
 
 <script>
 
+  const CSV_URL   = "resultados_1p1f.csv";
+  const NUM_TEMAS = 5;
   let DATA = {};
+
+  // Nota numérica (admite coma o punto decimal)
+  const esNota = v => /^\d+([.,]\d+)?$/.test(v);
+  const esc    = t => t.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+
+  // Excel suele quitar los ceros a la izquierda ("75381/8"): se normaliza a 6 dígitos + "/" + verificador
+  function normalizarLegajo(raw) {
+    const [num, dv] = raw.trim().split("/");
+    return dv === undefined ? raw.trim() : num.padStart(6, "0") + "/" + dv.trim();
+  }
 
   /* ── Carga y parseo del CSV ── */
   async function loadCSV() {
@@ -348,37 +148,41 @@
     const boxes    = Array.from(document.querySelectorAll(".digit-box"));
 
     try {
-      const response = await fetch("resultados.csv");
+      const response = await fetch(CSV_URL);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
-      const text  = await response.text();
-      // .replace elimina el BOM que agrega Excel al guardar como CSV
-      const lines = text.replace(/^\uFEFF/, "").trim().split(/\r?\n/);
+      const text  = (await response.text()).replace(/^\uFEFF/, "").trim();
+      const lines = text.split(/\r?\n/);
 
-      // Fila 0 = encabezado (Legajo;Nombre;2P2F;Situacion), se omite
+      // Delimitador detectado desde el encabezado (;  tab  ,)
+      const sep    = [";", "\t", ","].find(s => lines[0].includes(s));
+      const header = lines[0].split(sep).map(s => s.trim());
+
+      // Las columnas se ubican por nombre, no por posición
+      const col    = name => header.indexOf(name);
+      const iLeg   = col("Legajo"), iAlu = col("Alumno");
+      const iCur   = col("Cursada_1P1F"), iSit = col("Situacion_1P1F");
+      const iTemas = Array.from({ length: NUM_TEMAS }, (_, k) => col(`1P1F_${k + 1}`));
+      if ([iLeg, iAlu, iCur, iSit, ...iTemas].includes(-1)) throw new Error("Faltan columnas en el CSV");
+
       for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split(";").map(s => s.trim());
-        if (cols.length < 4 || !cols[0]) continue;
+        const cols = lines[i].split(sep).map(s => s.trim());
+        if (!cols[iLeg]) continue;
 
-        const [legajo, nombre, p2fRaw, sitRaw] = cols;
-
-        DATA[legajo] = {
-          nombre: nombre,
-          // Reemplaza coma decimal (Excel argentino) por punto antes de convertir
-          p2f: Number(p2fRaw.replace(",", ".")),
-          // Si el valor de Situacion es numérico, lo guardamos como número; si no, como string
-          // .replace elimina las comillas que Excel agrega alrededor de texto libre
-          sit: isNaN(sitRaw) || sitRaw === "" ? sitRaw.replace(/^"|"$/g, "").trim() : Number(sitRaw)
+        DATA[normalizarLegajo(cols[iLeg])] = {
+          alumno:  cols[iAlu] ?? "",
+          temas:   iTemas.map(k => cols[k] ?? ""),
+          cursada: (cols[iCur] ?? "").toUpperCase(),
+          sit:     cols[iSit] ?? ""
         };
       }
 
-      // Habilitar los bloques de dígitos y ocultar el hint de carga
       boxes.forEach(b => b.disabled = false);
       document.getElementById("loading-hint").classList.add("hidden");
       boxes[0].focus();
 
     } catch (err) {
-      console.error("Error cargando resultados.csv:", err);
+      console.error("Error cargando " + CSV_URL + ":", err);
       errorDiv.classList.remove("hidden");
       document.getElementById("loading-hint").classList.add("hidden");
     }
@@ -470,73 +274,54 @@
     loadCSV();
   });
 
-  /* ── Mensajes por situación ── */
-  const SITUACIONES = {
-    "Rec 1":     { msg: "<strong>Debe recuperar el Primer Parcial en el Flotante</strong> para acceder a la Promoción.",    cls: "warning", icon: "ti-alert-triangle" },
-    "Rec 2":     { msg: "<strong>Debe recuperar el Segundo Parcial en el Flotante</strong> para acceder a la Promoción.",   cls: "warning", icon: "ti-alert-triangle" },
-    "Rec 1 o 2": { msg: "<strong>Debe recuperar alguno de los Parciales en Flotante</strong> para acceder a la Promoción.", cls: "warning", icon: "ti-alert-triangle" },
-    "D":         { msg: "Lamentablemente <strong>debe volver a cursar la materia</strong>.",                                 cls: "danger",  icon: "ti-refresh-alert"  }
-  };
+  /* ── Resultados ── */
+  const BAR_COLORS = { success: "#15803d", warning: "#b45309", danger: "#b91c1c" };
 
-  const BAR_COLORS = {
-    success: "#15803d",
-    warning: "#b45309",
-    danger:  "#b91c1c"
-  };
+  // "RECUPERA 2, 4, 5" -> "recuperar los temas 2, 4, 5" (para que la frase quede gramatical).
+  // Para insertar Situacion_1P1F sin modificar, reemplazar el cuerpo por: return esc(sit);
+  function accionRecuperar(sit) {
+    const m = sit.match(/^RECUPERA\s+(.+)$/i);
+    if (!m) return esc(sit);
+    const plural = (m[1].match(/\d+/g) || []).length > 1;
+    return `recuperar ${plural ? "los temas" : "el tema"} ${esc(m[1])}`;
+  }
 
   function showResults(legajo) {
-    const resultsDiv = document.getElementById("results");
-    const { nombre, p2f, sit } = DATA[legajo];
-    const lineName = document.getElementById("line-name");
-    const line1 = document.getElementById("line1");
-    const line2 = document.getElementById("line2");
-    const icon1 = document.getElementById("icon1");
-    const icon2 = document.getElementById("icon2");
-    const bar   = document.getElementById("result-bar");
+    const { alumno, temas, cursada, sit } = DATA[legajo];
 
-    /* Línea de nombre */
-    lineName.innerHTML = `<strong>Apellido y Nombre:</strong> ${nombre}`;
-
+    document.getElementById("line-name").innerHTML = `<strong>Apellido y Nombre:</strong> ${esc(alumno)}`;
 
     /* Línea 1: resultado del parcial */
-    if (p2f >= 4) {
-      line1.innerHTML = `El parcial está <strong>Aprobado con nota ${p2f}</strong>`;
-      line1.className = "result-text";
-      icon1.className = "ti ti-circle-check success";
-    } else if (p2f >= 0) {
-      line1.innerHTML = "El parcial está <strong>Desaprobado</strong>";
-      line1.className = "result-text";
-      icon1.className = "ti ti-circle-x danger";
+    let html, cls, icon;
+    if (sit.toUpperCase() === "DESAPROBADO") {
+      html = "El parcial está <strong>Desaprobado</strong>.";
+      cls = "danger";  icon = "ti-circle-x";
+    } else if (esNota(sit)) {
+      html = `El parcial está <strong>Aprobado con nota ${esc(sit)}</strong>`;
+      cls = "success"; icon = "ti-circle-check";
+    } else if (cursada === "SI") {
+      html = `El parcial está <strong>Aprobado para Cursada.</strong><br>Para promocionar debe ${accionRecuperar(sit)}.`;
+      cls = "success"; icon = "ti-circle-check";
+    } else if (cursada === "NO") {
+      html = `El parcial <strong>no está Aprobado</strong> pero puede ${accionRecuperar(sit)} para mejorar su nota.`;
+      cls = "warning"; icon = "ti-alert-triangle";
     } else {
-      line1.innerHTML = "El parcial está <strong>Aprobado</strong>";
-      line1.className = "result-text";
-      icon1.className = "ti ti-circle-check success";
+      html = esc(sit);   // valor no previsto: se muestra tal cual
+      cls = "warning"; icon = "ti-info-circle";
     }
-    /* Línea 2: situación académica */
-    let barColorKey;
+    document.getElementById("line1").innerHTML = html;
+    document.getElementById("icon1").className = `ti ${icon} ${cls}`;
 
-    if (SITUACIONES[sit]) {
-      const { msg, cls, icon } = SITUACIONES[sit];
-      line2.innerHTML = msg;
-      line2.className = `result-text ${cls}`;
-      icon2.className = `ti ${icon} ${cls}`;
-      barColorKey     = cls;
-    } else if (typeof sit === "number") {
-      /* nota numérica >= 6: promociona */
-      line2.innerHTML = `<strong>Promociona</strong> con nota final <strong>${sit}</strong>. ¡Felicitaciones!`;
-      line2.className = "result-text success";
-      icon2.className = "ti ti-star success";
-      barColorKey     = "success";
-    } else {
-      /* texto libre del CSV: se muestra tal cual */
-      line2.textContent = sit;
-      line2.className   = "result-text warning";
-      icon2.className   = "ti ti-info-circle warning";
-      barColorKey       = "warning";
-    }
+    /* Línea 2: temas aprobados (columnas 1P1F_1 a 1P1F_5 con nota numérica) */
+    const aprobados = temas
+      .map((v, i) => esNota(v) ? `<div>El <strong>Tema ${i + 1}</strong> está Aprobado con puntaje <strong>${esc(v)}</strong></div>` : "")
+      .filter(Boolean);
+    document.getElementById("line2").innerHTML = aprobados.join("");
+    document.getElementById("icon2").className = "ti ti-checklist success";
+    document.getElementById("row-line2").classList.toggle("hidden", aprobados.length === 0);
 
-    bar.style.background = BAR_COLORS[barColorKey];
-    resultsDiv.classList.add("visible");
+    document.getElementById("result-bar").style.background = BAR_COLORS[cls];
+    document.getElementById("results").classList.add("visible");
   }
 
 </script>
