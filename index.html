@@ -82,23 +82,23 @@
     <span class="card-label">Ingrese su número de Legajo</span>
     <p class="card-hint">Completar con ceros a la izquierda si fuera necesario, por ejemplo: <strong>001234/7</strong></p>
     <div class="legajo-input">
-      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 1 del legajo" disabled>
-      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 2 del legajo" disabled>
-      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 3 del legajo" disabled>
-      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 4 del legajo" disabled>
-      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 5 del legajo" disabled>
-      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 6 del legajo" disabled>
+      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 1 del legajo">
+      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 2 del legajo">
+      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 3 del legajo">
+      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 4 del legajo">
+      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 5 del legajo">
+      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito 6 del legajo">
       <span class="legajo-slash">/</span>
-      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito verificador del legajo" disabled>
+      <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito verificador del legajo">
     </div>
-    <p class="loading-hint" id="loading-hint">Cargando datos...</p>
+    <p class="loading-hint hidden" id="loading-hint">Buscando...</p>
     <div class="search-error hidden" id="search-error">
       <i class="ti ti-search-off" aria-hidden="true"></i>
       Legajo no encontrado. Verificá que todos los dígitos sean correctos.
     </div>
     <div class="csv-error hidden" id="csv-error">
       <i class="ti ti-alert-circle" aria-hidden="true"></i>
-      No se pudieron cargar los datos. Intentá recargar la página o escribinos al correo de contacto.
+      No se pudieron obtener los datos. Intentá nuevamente en unos minutos o escribinos al correo de contacto.
     </div>
   </div>
 
@@ -128,8 +128,8 @@
 
 <script>
 
-  const CSV_URL   = "resultados.csv";
-  const NUM_TEMAS = 5;
+  // URL de la aplicación web de Apps Script (termina en /exec)
+  const API_URL = "PEGAR_AQUI_LA_URL_DE_APPS_SCRIPT/exec";
 
   // Descripción de cada tema (columnas 1P1F_1 a 1P1F_5)
   const TEMAS = {
@@ -139,63 +139,13 @@
     4: "Matrices y determinantes",
     5: "Espacios vectoriales"
   };
-  let DATA = {};
 
   // Nota numérica (admite coma o punto decimal)
   const esNota = v => /^\d+([.,]\d+)?$/.test(v);
   const esc    = t => t.replace(/[&<>]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
 
-  // Excel suele quitar los ceros a la izquierda ("75381/8"): se normaliza a 6 dígitos + "/" + verificador
-  function normalizarLegajo(raw) {
-    const [num, dv] = raw.trim().split("/");
-    return dv === undefined ? raw.trim() : num.padStart(6, "0") + "/" + dv.trim();
-  }
-
-  /* ── Carga y parseo del CSV ── */
-  async function loadCSV() {
-    const errorDiv = document.getElementById("csv-error");
-    const boxes    = Array.from(document.querySelectorAll(".digit-box"));
-
-    try {
-      const response = await fetch(CSV_URL);
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-      const text  = (await response.text()).replace(/^\uFEFF/, "").trim();
-      const lines = text.split(/\r?\n/);
-
-      // Delimitador detectado desde el encabezado (;  tab  ,)
-      const sep    = [";", "\t", ","].find(s => lines[0].includes(s));
-      const header = lines[0].split(sep).map(s => s.trim());
-
-      // Las columnas se ubican por nombre, no por posición
-      const col    = name => header.indexOf(name);
-      const iLeg   = col("Legajo"), iAlu = col("Alumno");
-      const iCur   = col("Cursada_1P1F"), iSit = col("Situacion_1P1F");
-      const iTemas = Array.from({ length: NUM_TEMAS }, (_, k) => col(`1P1F_${k + 1}`));
-      if ([iLeg, iAlu, iCur, iSit, ...iTemas].includes(-1)) throw new Error("Faltan columnas en el CSV");
-
-      for (let i = 1; i < lines.length; i++) {
-        const cols = lines[i].split(sep).map(s => s.trim());
-        if (!cols[iLeg]) continue;
-
-        DATA[normalizarLegajo(cols[iLeg])] = {
-          alumno:  cols[iAlu] ?? "",
-          temas:   iTemas.map(k => cols[k] ?? ""),
-          cursada: (cols[iCur] ?? "").toUpperCase(),
-          sit:     cols[iSit] ?? ""
-        };
-      }
-
-      boxes.forEach(b => b.disabled = false);
-      document.getElementById("loading-hint").classList.add("hidden");
-      boxes[0].focus();
-
-    } catch (err) {
-      console.error("Error cargando " + CSV_URL + ":", err);
-      errorDiv.classList.remove("hidden");
-      document.getElementById("loading-hint").classList.add("hidden");
-    }
-  }
+  // Identificador de la última consulta: permite descartar respuestas que llegan tarde
+  let reqId = 0;
 
   /* ── Lógica de los bloques de dígitos ── */
   function initDigitBoxes() {
@@ -254,33 +204,55 @@
     return boxes.slice(0, 6).map(b => b.value).join("") + "/" + boxes[6].value;
   }
 
-  function checkAndSearch() {
+  /* ── Consulta a la API (Apps Script) ──
+     El navegador envía solo el legajo y recibe únicamente la fila de ese alumno. */
+  async function checkAndSearch() {
     const boxes      = Array.from(document.querySelectorAll(".digit-box"));
     const errorEl    = document.getElementById("search-error");
+    const csvErrorEl = document.getElementById("csv-error");
     const resultsDiv = document.getElementById("results");
+    const hint       = document.getElementById("loading-hint");
+    const id = ++reqId;   // invalida cualquier consulta anterior
+
+    errorEl.classList.add("hidden");
+    csvErrorEl.classList.add("hidden");
 
     // Esperar a que todos los bloques estén completos antes de buscar
     if (!boxes.every(b => b.value !== "")) {
-      errorEl.classList.add("hidden");
       resultsDiv.classList.remove("visible");
+      hint.classList.add("hidden");
       return;
     }
 
-    const legajo = getLegajo();
+    hint.classList.remove("hidden");
 
-    if (!DATA[legajo]) {
-      errorEl.classList.remove("hidden");
+    try {
+      const res = await fetch(`${API_URL}?legajo=${encodeURIComponent(getLegajo())}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (id !== reqId) return;   // llegó tarde: ya hay otra consulta más reciente
+
+      if (data.ok) {
+        showResults(data);
+      } else if (data.error === "no_encontrado" || data.error === "formato") {
+        resultsDiv.classList.remove("visible");
+        errorEl.classList.remove("hidden");
+      } else {
+        throw new Error(data.error || "Respuesta inesperada");
+      }
+    } catch (err) {
+      if (id !== reqId) return;
+      console.error("Error consultando la API:", err);
       resultsDiv.classList.remove("visible");
-      return;
+      csvErrorEl.classList.remove("hidden");
+    } finally {
+      if (id === reqId) hint.classList.add("hidden");
     }
-
-    errorEl.classList.add("hidden");
-    showResults(legajo);
   }
 
   document.addEventListener("DOMContentLoaded", () => {
     initDigitBoxes();
-    loadCSV();
+    document.querySelector(".digit-box").focus();
   });
 
   /* ── Resultados ── */
@@ -295,8 +267,8 @@
     return `recuperar ${plural ? "los temas" : "el tema"} ${esc(m[1])}`;
   }
 
-  function showResults(legajo) {
-    const { alumno, temas, cursada, sit } = DATA[legajo];
+  function showResults(rec) {
+    const { alumno, temas, cursada, sit } = rec;
 
     document.getElementById("line-name").innerHTML = `<strong>Apellido y Nombre:</strong> ${esc(alumno)}`;
 
