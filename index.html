@@ -9,11 +9,12 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; background: #f1f5f9; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 3rem 1.25rem 4rem; color: #111827; }
     .page { width: 100%; max-width: 520px; }
+    strong { font-weight: 600; }
 
     /* ── Encabezado ── */
     .header { text-align: center; margin-bottom: 2rem; }
     .header-badge { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #1e40af; background: #eff6ff; border: 1px solid #bfdbfe; padding: 4px 14px; border-radius: 999px; margin-bottom: 16px; }
-    .header h1 { font-size: 22px; font-weight: 600; color: #0f172a; line-height: 1.35; margin-bottom: 8px; }
+    .header h1 { font-size: clamp(24px, 6vw, 28px); font-weight: 600; color: #0f172a; line-height: 1.35; margin-bottom: 8px; }
     .header .subtitle { font-size: 15px; color: #64748b; }
     .divider { height: 1px; background: #e2e8f0; margin-bottom: 2rem; }
 
@@ -21,17 +22,24 @@
     .card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 1.25rem 1.5rem; }
     .card-label { display: block; font-size: 13px; font-weight: 500; color: #475569; margin-bottom: 6px; }
     .card-hint { font-size: 12px; color: #94a3b8; margin-bottom: 18px; line-height: 1.5; }
-    .card-hint strong { color: #64748b; font-weight: 600; }
+    .card-hint strong { color: #64748b; }
 
     /* ── Bloques de dígitos ── */
     .legajo-input { display: flex; align-items: center; justify-content: center; gap: clamp(4px, 1.2vw, 7px); }
     .digit-box { width: clamp(34px, 9vw, 44px); height: clamp(42px, 11vw, 52px); text-align: center; font-size: clamp(18px, 4.5vw, 22px); font-weight: 700; font-family: 'Courier New', Courier, monospace; border: 1.5px solid #cbd5e1; border-radius: 8px; background: #ffffff; color: #0f172a; outline: none; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s; caret-color: transparent; }
     .digit-box:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12); background: #f8fafc; }
     .digit-box.filled { border-color: #94a3b8; background: #f8fafc; }
-    .digit-box:disabled { background: #f1f5f9; border-color: #e2e8f0; color: #94a3b8; cursor: not-allowed; }
     .legajo-slash { font-size: clamp(22px, 5.5vw, 28px); font-weight: 300; color: #94a3b8; padding: 0 2px; user-select: none; line-height: 1; }
     .loading-hint { margin-top: 10px; font-size: 12px; color: #94a3b8; text-align: center; }
     .loading-hint.hidden { display: none; }
+    /* Puntos suspensivos: aparecen de a uno y luego se reinicia la animación */
+    .dots span { opacity: 0; }
+    .dots span:nth-child(1) { animation: dot1 1.4s infinite; }
+    .dots span:nth-child(2) { animation: dot2 1.4s infinite; }
+    .dots span:nth-child(3) { animation: dot3 1.4s infinite; }
+    @keyframes dot1 { 0%, 19.9% { opacity: 0; } 20%, 100% { opacity: 1; } }
+    @keyframes dot2 { 0%, 39.9% { opacity: 0; } 40%, 100% { opacity: 1; } }
+    @keyframes dot3 { 0%, 59.9% { opacity: 0; } 60%, 100% { opacity: 1; } }
 
     /* ── Errores ── */
     .search-error { margin-top: 12px; padding: 10px 14px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; font-size: 13px; color: #9a3412; display: flex; gap: 8px; align-items: center; }
@@ -39,25 +47,32 @@
     .csv-error { margin-top: 0.75rem; padding: 10px 14px; background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px; font-size: 13px; color: #b91c1c; display: flex; gap: 8px; align-items: center; }
     .csv-error.hidden { display: none; }
 
-    /* ── Resultados ── */
-    .results { display: none; margin-top: 1rem; }
-    .results.visible { display: block; }
-    .result-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; }
-    .result-bar { height: 4px; width: 100%; transition: background 0.25s; }
-    .result-row { padding: 1rem 1.5rem; display: flex; gap: 12px; align-items: flex-start; }
-    .result-row + .result-row { border-top: 1px solid #f1f5f9; }
-    .result-row.hidden { display: none; }
-    .result-row .ti { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
-    .result-text { font-size: 14px; line-height: 1.65; }
-    .result-text strong { font-weight: 600; }
-    #line1 { font-size: 16.5px; }
-    #line2 { font-size: 14.5px; }
-    #line2 div + div { margin-top: 4px; }
-    #row-name .ti-user { color: #64748b; }
-    #line-name { color: #475569; font-weight: 500; text-transform: uppercase; }
-    .success { color: #15803d; }
-    .warning { color: #b45309; }
-    .danger  { color: #b91c1c; }
+    /* ── Menú de desplegables ── */
+    .menu { display: none; margin-top: 1.25rem; }
+    .menu.visible { display: block; }
+    .student { font-size: 13px; font-weight: 600; color: #111827; text-transform: uppercase; text-align: center; margin-bottom: 12px; padding: 0 2px; }
+    .acc { border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; background: #ffffff; }
+    .acc + .acc { margin-top: 10px; }
+    .acc-head { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; background: none; border: none; font: inherit; font-size: 14.5px; font-weight: 600; color: #111827; cursor: pointer; text-align: left; }
+    .chev { font-size: 11px; color: #94a3b8; transition: transform 0.15s; }
+    .acc.open > .acc-head .chev { transform: rotate(90deg); }
+    .acc-body { display: none; border-top: 1px solid #e2e8f0; }
+    .acc.open > .acc-body { display: block; }
+    .nested { margin: 10px 12px; border-radius: 10px; }
+    .nested:last-child { margin-bottom: 12px; }
+    .nested > .acc-head { font-size: 13.5px; font-weight: 500; padding: 11px 14px; }
+    .soon { padding: 16px; font-size: 13px; color: #94a3b8; text-align: center; }
+
+    /* ── Resultados dentro de cada bloque ── */
+    .result { padding: 14px 16px; }
+    .result-row { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.6; }
+    .result-row + .result-row { margin-top: 10px; padding-top: 10px; border-top: 1px solid #f1f5f9; }
+    /* Separador destacado entre el resultado general y el detalle por temas */
+    .result-row:first-child + .result-row { margin-top: 14px; padding-top: 14px; border-top: 2px solid #cbd5e1; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 6px; flex-shrink: 0; }
+    .dot.success { background: #15803d; }
+    .dot.warning { background: #b45309; }
+    .dot.danger  { background: #b91c1c; }
 
     /* ── Contacto y Footer ── */
     .contact-note { text-align: center; margin-top: 2rem; font-size: 14px; color: #475569; }
@@ -71,9 +86,8 @@
 <div class="page">
 
   <div class="header">
-    <span class="header-badge">1er Parcial · 1ra Fecha</span>
+    <span class="header-badge">Resultados de parciales</span>
     <h1>Matemática C<br>Comisión MC4 - 2026</h1>
-    <p class="subtitle">Resultados del Primer Parcial</p>
   </div>
 
   <div class="divider"></div>
@@ -91,7 +105,7 @@
       <span class="legajo-slash">/</span>
       <input type="text" class="digit-box" maxlength="1" inputmode="numeric" aria-label="Dígito verificador del legajo">
     </div>
-    <p class="loading-hint hidden" id="loading-hint">Buscando...</p>
+    <p class="loading-hint hidden" id="loading-hint">Buscando<span class="dots" aria-hidden="true"><span>.</span><span>.</span><span>.</span></span></p>
     <div class="search-error hidden" id="search-error">
       <i class="ti ti-search-off" aria-hidden="true"></i>
       Legajo no encontrado. Verifique que todos los dígitos sean correctos.
@@ -102,23 +116,7 @@
     </div>
   </div>
 
-  <div class="results" id="results">
-    <div class="result-card">
-      <div class="result-bar" id="result-bar"></div>
-      <div class="result-row" id="row-name">
-        <i class="ti ti-user" aria-hidden="true"></i>
-        <div class="result-text" id="line-name"></div>
-      </div>
-      <div class="result-row">
-        <i id="icon1" class="ti" aria-hidden="true"></i>
-        <div class="result-text" id="line1"></div>
-      </div>
-      <div class="result-row" id="row-line2">
-        <i id="icon2" class="ti" aria-hidden="true"></i>
-        <div class="result-text" id="line2"></div>
-      </div>
-    </div>
-  </div>
+  <div class="menu" id="menu"></div>
 
   <p class="contact-note">Ante cualquier duda o inconveniente, escribinos al correo <a href="mailto:gervasiojj@fisica.unlp.edu.ar">gervasiojj@fisica.unlp.edu.ar</a></p>
 
@@ -138,6 +136,28 @@
     3: "Sistemas de ecuaciones lineales",
     4: "Matrices y determinantes",
     5: "Espacios vectoriales"
+  };
+
+  /* ── Estructura del menú ──
+     Orden en pantalla = orden del calendario académico. */
+  const MENU = [
+    { k: "1p", t: "Primer Parcial",  hijos: [{ k: "1p1f", t: "Primera Fecha" }, { k: "1p2f", t: "Recuperatorio" }] },
+    { k: "2p", t: "Segundo Parcial", hijos: [{ k: "2p1f", t: "Primera Fecha" }, { k: "2p2f", t: "Recuperatorio" }] },
+    { k: "flot",  t: "Flotante" },
+    { k: "final", t: "Resultados Finales" }
+  ];
+
+  // Prioridad para abrir por defecto (de atrás para adelante): el primer bloque con datos gana.
+  const ORDEN_PRIORIDAD = ["final", "flot", "2p2f", "2p1f", "1p2f", "1p1f"];
+  const PADRE = { "1p1f": "1p", "1p2f": "1p", "2p1f": "2p", "2p2f": "2p" };
+
+  /* ── Renderizadores por bloque ──
+     Un bloque solo muestra resultados si tiene función acá y esta devuelve HTML.
+     Todo bloque sin renderizador (o que devuelva null) muestra "Próximamente".
+     Cuando exista el CSV de otro bloque: agregar su función en RENDER. Ej.:
+       RENDER["1p2f"] = rec => rec.p1f2 ? `<div class="result">…</div>` : null;   */
+  const RENDER = {
+    "1p1f": render1P1F
   };
 
   // Nota numérica (admite coma o punto decimal)
@@ -210,7 +230,7 @@
     const boxes      = Array.from(document.querySelectorAll(".digit-box"));
     const errorEl    = document.getElementById("search-error");
     const csvErrorEl = document.getElementById("csv-error");
-    const resultsDiv = document.getElementById("results");
+    const menuDiv    = document.getElementById("menu");
     const hint       = document.getElementById("loading-hint");
     const id = ++reqId;   // invalida cualquier consulta anterior
 
@@ -219,7 +239,7 @@
 
     // Esperar a que todos los bloques estén completos antes de buscar
     if (!boxes.every(b => b.value !== "")) {
-      resultsDiv.classList.remove("visible");
+      menuDiv.classList.remove("visible");
       hint.classList.add("hidden");
       return;
     }
@@ -233,9 +253,9 @@
       if (id !== reqId) return;   // llegó tarde: ya hay otra consulta más reciente
 
       if (data.ok) {
-        showResults(data);
+        showMenu(data);
       } else if (data.error === "no_encontrado" || data.error === "formato") {
-        resultsDiv.classList.remove("visible");
+        menuDiv.classList.remove("visible");
         errorEl.classList.remove("hidden");
       } else {
         throw new Error(data.error || "Respuesta inesperada");
@@ -243,7 +263,7 @@
     } catch (err) {
       if (id !== reqId) return;
       console.error("Error consultando la API:", err);
-      resultsDiv.classList.remove("visible");
+      menuDiv.classList.remove("visible");
       csvErrorEl.classList.remove("hidden");
     } finally {
       if (id === reqId) hint.classList.add("hidden");
@@ -252,11 +272,11 @@
 
   document.addEventListener("DOMContentLoaded", () => {
     initDigitBoxes();
+    initMenu();
     document.querySelector(".digit-box").focus();
   });
 
-  /* ── Resultados ── */
-  const BAR_COLORS = { success: "#15803d", warning: "#b45309", danger: "#b91c1c" };
+  /* ── Resultado del Primer Parcial - Primera Fecha (CSV 1P1F) ── */
 
   // "RECUPERA 2, 4, 5" -> "recuperar los temas 2, 4, 5" (para que la frase quede gramatical).
   // Para insertar Situacion_1P1F sin modificar, reemplazar el cuerpo por: return esc(sit);
@@ -267,44 +287,91 @@
     return `recuperar ${plural ? "los temas" : "el tema"} ${esc(m[1])}`;
   }
 
-  function showResults(rec) {
-    const { alumno, temas, cursada, sit } = rec;
+  const fila = (cls, html) => `<div class="result-row"><span class="dot ${cls}"></span><span>${html}</span></div>`;
 
-    document.getElementById("line-name").innerHTML = `<strong>Apellido y Nombre:</strong> ${esc(alumno)}`;
+  function render1P1F(rec) {
+    const { temas, cursada, sit } = rec;
+    const desaprobado = sit.toUpperCase() === "DESAPROBADO";
 
-    /* Línea 1: resultado del parcial */
-    let html, cls, icon;
-    if (sit.toUpperCase() === "DESAPROBADO") {
+    /* Línea 1: resultado del parcial (verde solo si está aprobado con nota) */
+    let html, cls;
+    if (desaprobado) {
       html = "El parcial está <strong>Desaprobado</strong>.";
-      cls = "danger";  icon = "ti-circle-x";
+      cls = "danger";
     } else if (esNota(sit)) {
       html = `El parcial está <strong>Aprobado con nota ${esc(sit)}</strong>`;
-      cls = "success"; icon = "ti-circle-check";
+      cls = "success";
     } else if (cursada === "SI") {
       html = `El parcial está <strong>Aprobado para Cursada.</strong><br>Para promocionar debe ${accionRecuperar(sit)}.`;
-      cls = "success"; icon = "ti-circle-check";
+      cls = "warning";
     } else if (cursada === "NO") {
       html = `El parcial <strong>no está Aprobado</strong> pero puede ${accionRecuperar(sit)} para mejorar su nota.`;
-      cls = "warning"; icon = "ti-alert-triangle";
+      cls = "warning";
     } else {
       html = esc(sit);   // valor no previsto: se muestra tal cual
-      cls = "warning"; icon = "ti-info-circle";
+      cls = "warning";
     }
-    document.getElementById("line1").innerHTML = html;
-    document.getElementById("icon1").className = `ti ${icon} ${cls}`;
+    const filas = [fila(cls, html)];
 
-    /* Línea 2: temas aprobados (columnas 1P1F_1 a 1P1F_5 con nota numérica).
-       No se muestra si el parcial está Desaprobado o Aprobado con nota. */
-    const mostrarTemas = sit.toUpperCase() !== "DESAPROBADO" && !esNota(sit);
-    const aprobados = !mostrarTemas ? [] : temas
-      .map((v, i) => esNota(v) ? `<div>El <strong>Tema ${i + 1} - ${TEMAS[i + 1]}</strong> está Aprobado con puntaje <strong>${esc(v)}</strong></div>` : "")
-      .filter(Boolean);
-    document.getElementById("line2").innerHTML = aprobados.join("");
-    document.getElementById("icon2").className = "ti ti-checklist success";
-    document.getElementById("row-line2").classList.toggle("hidden", aprobados.length === 0);
+    /* Temas aprobados (1P1F_1 a 1P1F_5 con nota numérica).
+       No se muestran si el parcial está Desaprobado o Aprobado con nota. */
+    if (!desaprobado && !esNota(sit)) {
+      temas.forEach((v, i) => {
+        if (esNota(v)) filas.push(fila("success", `El <strong>Tema ${i + 1} - ${TEMAS[i + 1]}</strong> está aprobado con puntaje <strong>${esc(v)}</strong>`));
+      });
+    }
+    return `<div class="result">${filas.join("")}</div>`;
+  }
 
-    document.getElementById("result-bar").style.background = BAR_COLORS[cls];
-    document.getElementById("results").classList.add("visible");
+  /* ── Menú de desplegables ── */
+  function setOpen(el, open) {
+    el.classList.toggle("open", open);
+    el.querySelector(":scope > .acc-head").setAttribute("aria-expanded", open);
+  }
+
+  function initMenu() {
+    const menu = document.getElementById("menu");
+    menu.addEventListener("click", (e) => {
+      const head = e.target.closest(".acc-head");
+      if (!head) return;
+      const el = head.parentElement;
+      const abrir = !el.classList.contains("open");
+      // Desplegables principales: uno abierto a la vez. Sub-desplegables: independientes.
+      if (el.classList.contains("acc-top")) {
+        menu.querySelectorAll(".acc-top").forEach(x => setOpen(x, false));
+      }
+      setOpen(el, abrir);
+    });
+  }
+
+  function showMenu(rec) {
+    const menu = document.getElementById("menu");
+
+    // HTML de cada bloque que tiene datos para este legajo
+    const contenido = {};
+    Object.keys(RENDER).forEach(k => { contenido[k] = RENDER[k](rec) || null; });
+    const cuerpo = k => contenido[k] || '<p class="soon">Próximamente</p>';
+
+    const acc = (k, titulo, body, cls) =>
+      `<div class="acc ${cls}" data-k="${k}">
+         <button class="acc-head" aria-expanded="false"><span>${titulo}</span><span class="chev" aria-hidden="true">▶</span></button>
+         <div class="acc-body">${body}</div>
+       </div>`;
+
+    menu.innerHTML =
+      `<p class="student">Apellido y Nombre: ${esc(rec.alumno)}</p>` +
+      MENU.map(m => m.hijos
+        ? acc(m.k, m.t, m.hijos.map(h => acc(h.k, h.t, cuerpo(h.k), "nested")).join(""), "acc-top")
+        : acc(m.k, m.t, cuerpo(m.k), "acc-top")
+      ).join("");
+
+    // Apertura por defecto: Resultados Finales si tiene datos; si no, el último bloque con datos
+    const k = ORDEN_PRIORIDAD.find(x => contenido[x]);
+    if (k) {
+      if (PADRE[k]) setOpen(menu.querySelector(`[data-k="${PADRE[k]}"]`), true);
+      setOpen(menu.querySelector(`[data-k="${k}"]`), true);
+    }
+    menu.classList.add("visible");
   }
 
 </script>
