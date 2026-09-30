@@ -73,6 +73,7 @@
     .dot.success { background: #15803d; }
     .dot.warning { background: #b45309; }
     .dot.danger  { background: #b91c1c; }
+    .dot.neutral { background: #cbd5e1; }
 
     /* ── Contacto y Footer ── */
     .contact-note { text-align: center; margin-top: 2rem; font-size: 14px; color: #475569; }
@@ -291,11 +292,15 @@
 
   function render1P1F(rec) {
     const { temas, cursada, sit } = rec;
+    const ausente     = sit.toUpperCase() === "AUSENTE";
     const desaprobado = sit.toUpperCase() === "DESAPROBADO";
 
     /* Línea 1: resultado del parcial (verde solo si está aprobado con nota) */
     let html, cls;
-    if (desaprobado) {
+    if (ausente) {
+      html = "<strong>Ausente</strong>: no se presentó a rendir.";
+      cls = "neutral";
+    } else if (desaprobado) {
       html = "El parcial está <strong>Desaprobado</strong>.";
       cls = "danger";
     } else if (esNota(sit)) {
@@ -314,8 +319,8 @@
     const filas = [fila(cls, html)];
 
     /* Temas aprobados (1P1F_1 a 1P1F_5 con nota numérica).
-       No se muestran si el parcial está Desaprobado o Aprobado con nota. */
-    if (!desaprobado && !esNota(sit)) {
+       No se muestran si el parcial está Ausente, Desaprobado o Aprobado con nota. */
+    if (!ausente && !desaprobado && !esNota(sit)) {
       temas.forEach((v, i) => {
         if (esNota(v)) filas.push(fila("success", `El <strong>Tema ${i + 1} - ${TEMAS[i + 1]}</strong> está aprobado con puntaje <strong>${esc(v)}</strong>`));
       });
