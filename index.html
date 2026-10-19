@@ -166,8 +166,14 @@
     "Matrices y determinantes",
     "Espacios vectoriales"
   ];
-  // Temas del Segundo Parcial (provisorios: reemplazar por los reales)
-  const TEMAS_2P = ["Ecuaciones diferenciales de primer orden", "Ecuaciones lineales de segundo orden", "Transformada de Laplace", "Sistemas de ecuaciones diferenciales", "Series de Fourier"];
+  // Temas del Segundo Parcial (columnas 2P1F_1 a 2P1F_5 y 2P2F_1 a 2P2F_5)
+  const TEMAS_2P = [
+    "Transformaciones lineales - Proyección ortogonal",
+    "Números complejos",
+    "Autovalores - Diagonalización",
+    "Ecuaciones diferenciales ordinarias",
+    "Transf. de Fourier - Ecuaciones en derivadas parciales"
+  ];
 
   /* ── Estructura del menú ──
      Orden en pantalla = orden del calendario académico. */
@@ -183,15 +189,21 @@
   const PADRE = { "1p1f": "1p", "1p2f": "1p", "2p1f": "2p", "2p2f": "2p" };
 
   /* ── Renderizadores por bloque ──
-     Un bloque solo muestra resultados si tiene función acá y esta devuelve HTML.
-     Todo bloque sin renderizador (o que devuelva null) muestra "Próximamente".
-     Cuando exista el CSV de otro bloque: agregar su función en RENDER. Ej.:
-       RENDER["1p2f"] = rec => rec.p1f2 ? `<div class="result">…</div>` : null;   */
-  const RENDER = {
-    "1p1f": rec => renderBloque(rec, TEMAS),
-    "1p2f": rec => rec.r1p2f ? renderBloque(rec.r1p2f, TEMAS) : null,       // pendiente: el Apps Script aún no envía este bloque
-    "2p1f": rec => rec.r2p1f ? renderBloque(rec.r2p1f, TEMAS_2P) : null      // pendiente: el Apps Script aún no envía este bloque
-  };
+     La API devuelve { ok, alumno, examenes: { "1P1F": {...}, "1P2F": {...}, ... } } y cada instancia
+     trae un estado: "ok" | "sin_registro" | "sin_archivo" | "error".
+     Un bloque sin renderizador (flotante, finales) o con estado "sin_archivo" muestra "Próximamente".
+     Para sumar una instancia: agregarla en ID_API y TEMAS_DE (y en el Apps Script). */
+  const ID_API   = { "1p1f": "1P1F", "1p2f": "1P2F", "2p1f": "2P1F", "2p2f": "2P2F" };
+  const TEMAS_DE = { "1p1f": TEMAS,   "1p2f": TEMAS,   "2p1f": TEMAS_2P, "2p2f": TEMAS_2P };
+  // Primera fecha del mismo parcial (para un Ausente en el recuperatorio que ya tenía nota)
+  const PREVIA   = { "1p2f": "1p1f", "2p2f": "2p1f" };
+  const RENDER = {};
+  Object.keys(ID_API).forEach(k => {
+    RENDER[k] = rec => {
+      const ex = rec.examenes || {};
+      return renderInstancia(ex[ID_API[k]], TEMAS_DE[k], ex[ID_API[PREVIA[k]]]);
+    };
+  });
 
   // Nota numérica (admite coma o punto decimal)
   const esNota = v => /^\d+([.,]\d+)?$/.test(v);
@@ -322,7 +334,14 @@
   /* Colores: verde = aprobado con nota · marrón = aprobado para cursada · rojo = desaprobado / no aprobado */
   function estado(d) {
     const sit = d.sit, up = sit.toUpperCase();
-    if (up === "AUSENTE")     return { cls: "neutral", tag: "Ausente", html: "<strong>Ausente</strong>: no se presentó a rendir.", temas: false };
+    if (up === "AUSENTE") {
+      // El mensaje principal es el mismo para todos los Ausentes. Si ya tenía la cursada aprobada,
+      // la solapa lo indica; los temas aprobados (si los hay) se detallan debajo.
+      const cur = d.cursada === "SI";
+      return { cls: cur ? "cursada" : "neutral", dot: "neutral", ausente: true,
+               tag: cur ? "Aprobado para Cursada" : "Ausente",
+               html: "<strong>Ausente</strong>: no se presentó a rendir.", temas: true };
+    }
     if (up === "DESAPROBADO") return { cls: "danger", tag: "Desaprobado", html: "El parcial está <strong>Desaprobado</strong>.", temas: false };
     if (esNota(sit))          return { cls: "success", tag: `Aprobado: ${esc(sit)}`, html: `El parcial está <strong>Aprobado con nota ${esc(sit)}</strong>`, temas: false };
     if (d.cursada === "SI")   return { cls: "cursada", tag: "Aprobado para Cursada", html: `El parcial está <strong>Aprobado para Cursada.</strong><br>Para promocionar debe ${accionRecuperar(sit)}.`, temas: true };
@@ -332,13 +351,31 @@
 
   const fila = (cls, html) => `<div class="result-row"><span class="dot ${cls}"></span><span>${html}</span></div>`;
 
-  // d = { temas, cursada, sit } de un bloque; devuelve { cls, tag, body }
-  function renderBloque(d, temas) {
-    const e = estado(d), filas = [fila(e.cls, e.html)];
+  // d = { temas, cursada, sit } de un bloque; previa = datos de la primera fecha del mismo parcial (opcional).
+  // Devuelve { cls, tag, body }
+  function renderBloque(d, temas, previa) {
+    const e = estado(d), filas = [fila(e.dot || e.cls, e.html)];
     if (e.temas) d.temas.forEach((v, i) => {
       if (esNota(v)) filas.push(fila("success", `El <strong>Tema ${i + 1} - ${temas[i]}</strong> está aprobado con puntaje <strong>${esc(v)}</strong>`));
     });
+    // Ausente en el recuperatorio, pero con nota ya obtenida en la primera fecha
+    if (e.ausente && previa && previa.estado === "ok" && esNota(previa.sit)) {
+      filas.push(fila("success", `Nota obtenida en la Primera Fecha: <strong>${esc(previa.sit)}</strong>`));
+      e.cls = "success"; e.tag = `Aprobado: ${esc(previa.sit)}`;
+    }
     return { cls: e.cls, tag: e.tag, body: `<div class="result">${filas.join("")}</div>` };
+  }
+
+  // Un bloque sin resultado utilizable (no cuenta para la apertura por defecto)
+  const vacio = (tag, msg) => ({ cls: "neutral", tag, body: `<p class="soon">${msg}</p>`, vacio: true });
+
+  // d = datos de una instancia según la API. null => "Próximamente" (solo cuando no hay CSV cargado).
+  // Cualquier otro estado distinto de "ok" (CSV con columnas rotas, o legajo ausente del archivo,
+  // que no debería ocurrir) muestra un aviso genérico.
+  function renderInstancia(d, temas, previa) {
+    if (!d || d.estado === "sin_archivo") return null;
+    if (d.estado !== "ok") return vacio("Error", "No se pudieron cargar los datos de esta instancia. Intente nuevamente más tarde.");
+    return renderBloque(d, temas, previa);
   }
 
   /* ── Globos + desplegables ── */
@@ -390,11 +427,16 @@
   }
 
   function showMenu(rec) {
+    // Compatibilidad: respuesta de la API anterior (un solo examen, sin "examenes")
+    if (!rec.examenes) {
+      rec = { alumno: rec.alumno, examenes: { "1P1F": { estado: "ok", temas: rec.temas, cursada: rec.cursada, sit: rec.sit } } };
+    }
     contenido = {};
     Object.keys(RENDER).forEach(k => { contenido[k] = RENDER[k](rec) || null; });
 
-    // Apertura por defecto: el último bloque con datos (su globo y su desplegable)
-    const k = ORDEN_PRIORIDAD.find(x => contenido[x]);
+    // Apertura por defecto: el último bloque con datos (su globo y su desplegable).
+    // "Ausente" cuenta como dato; solo se saltean los bloques sin CSV ("Próximamente") o con error.
+    const k = ORDEN_PRIORIDAD.find(x => contenido[x] && !contenido[x].vacio);
     abiertos = new Set(k ? [k] : []);
     activo = k ? (PADRE[k] || k) : MENU[0].k;
 
